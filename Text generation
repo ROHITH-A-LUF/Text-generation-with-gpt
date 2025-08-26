@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sleek ChatBot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: #f9f9f9;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .dark-mode {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    #sidebar {
+      width: 220px;
+      background: #0077b6;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    #sidebar h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    #theme-toggle {
+      margin-top: auto;
+      padding: 10px;
+      background: #00b4d8;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    #chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    #chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message {
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      background-color: #48cae4;
+      align-self: flex-end;
+      color: white;
+    }
+
+    .bot-message {
+      background-color: #e0e0e0;
+      align-self: flex-start;
+    }
+
+    .dark-mode .user-message {
+      background-color: #219ebc;
+    }
+
+    .dark-mode .bot-message {
+      background-color: #333;
+      color: #eee;
+    }
+
+    #input-container {
+      display: flex;
+      padding: 15px;
+      border-top: 1px solid #ccc;
+    }
+
+    #user-input {
+      flex: 1;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
+    }
+
+    .dark-mode #user-input {
+      background-color: #1f1f1f;
+      color: #fff;
+      border-color: #444;
+    }
+
+    #send-btn {
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #0077b6;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    #send-btn:hover {
+      background-color: #023e8a;
+    }
+
+    #clear-btn {
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+
+    .dark-mode #clear-btn {
+      color: #bbb;
+    }
+
+    .timestamp {
+      font-size: 0.7rem;
+      opacity: 0.6;
+      margin-top: 3px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h1>ChatEve</h1>
+    <button id="theme-toggle">Toggle Theme</button>
+  </div>
+
+  <div id="chat-area">
+    <div id="chat-box">
+      <div class="bot-message message">👋 Hi! Ask me anything.</div>
+    </div>
+
+    <div id="input-container">
+      <input type="text" id="user-input" placeholder="Type a message..." />
+      <button id="send-btn">Send</button>
+    </div>
+    <div style="padding: 0 20px 10px">
+      <button id="clear-btn">Clear Chat</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    const responses = {
+      "hello": "Hello! How can I assist you today?",
+      "what is javascript": "JavaScript is a powerful scripting language used to create dynamic web content.",
+      "what is html": "HTML stands for HyperText Markup Language.",
+      "what is css": "CSS is used to style and layout web pages.",
+      "what is your name": "I'm your friendly chatbot!",
+      "who created you": "I was created by developers to assist with your questions.",
+      "what can you do": "I can answer basic questions and help you learn web development concepts.",
+      "what is a function": "A function is a block of code designed to perform a particular task.",
+      "what is an array": "An array is a collection of items stored in a single variable.",
+      "what is a variable": "A variable is used to store data that can be used and changed later.",
+      "what is a loop": "A loop is used to repeat a block of code multiple times.",
+      "what is an object": "An object is a data structure that contains properties and methods.",
+      "bye": "Bye! Have a nice day.",
+      "thank you": "You're welcome!",
+      "default": "Hmm... I don't know the answer to that yet. Ask me something else!"
+    };
+
+    function addMessage(text, type) {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('message', type);
+      msgDiv.textContent = text;
+
+      const time = document.createElement('span');
+      time.classList.add('timestamp');
+      time.textContent = new Date().toLocaleTimeString();
+      msgDiv.appendChild(time);
+
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getResponse(text) {
+      const key = text.trim().toLowerCase();
+      return responses[key] || responses["default"];
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      addMessage(text, 'user-message');
+      setTimeout(() => {
+        const reply = getResponse(text);
+        addMessage(reply, 'bot-message');
+      }, 500);
+
+      userInput.value = '';
+    });
+
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      chatBox.innerHTML = '<div class="bot-message message">👋 Hi! Ask me anything.</div>';
+    });
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+    });
+  </script>
+</body>
+</html>
